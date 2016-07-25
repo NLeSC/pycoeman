@@ -51,8 +51,8 @@ def readFile(fileName, resampling = None, ignoreLargeJumps = False):
     df.index.rename('Time')
     df['MEM'] = ((df['MEM'] / 100.) * memtotal)
     if resampling != None:
-        df = df.resample(str(resampling) + 's')
-    return (df, hostname, numcores, memtotal)
+        df = df.resample(str(resampling) + 's').mean()
+    return (df, hostname.strip(), numcores, memtotal)
 
 def run(tools, folders, ignoreLargeJumps):
 
