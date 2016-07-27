@@ -34,7 +34,7 @@ def argument_parser():
    # define argument menu
     description = "Creates the jobs to submit to a SGE cluster for the commands specified in the XML configuration file. During the execution of each command there is monitoring of the used CPU/MEM/disk by the system. This assumes that pycoeman and othe required software are installed in the nodes of the SGE cluster (a setenv file is used to set the environment)"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-d', '--dataDir',default='', help='Data directory with the required data and the parallel configuration folder (this has to be shared and accessible from the cluster nodes)', type=str, required=True)
+    parser.add_argument('-d', '--dataDir',default='', help='Data directory with the required data (this has to be shared and accessible from the cluster nodes)', type=str, required=True)
     parser.add_argument('-c', '--configFile',default='', help='XML configuration file with the several commands that will be executed in parallel through in SGE cluster. This file must be in the data directory', type=str, required=True)
     parser.add_argument('-s', '--source',default='', help='Set environment file (this file is sourced before the remote execution of any command, the file must be in a shared folder and be accessible from the cluster nodes)', type=str, required=True)
     parser.add_argument('-r', '--remoteExeDir',default='', help='Remote execution directory. Each command will be executed in a cluster node in a folder like <remoteExeDir>/<commandId>', type=str, required=True)
