@@ -12,7 +12,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
         (df, hostname, numcores, memtotal)  = get_monitor_nums.readFile(inputArgument, resampling, ignoreLargeJumps)
         availMap[hostname] = (numcores, memtotal)
     else:
-        if resampling == None or resampling < 5:
+        if resampling == None or resampling < 2:
             raise Exception('Resampling must be higher than 5 if combining monitor files!')
 
         monFiles = [os.path.join(dirpath, f)
@@ -67,7 +67,7 @@ def argument_parser():
     description = "Plot the CPU/MEM usage of a command executed using pycoeman (it is possible to combine .mon files of Distributed Tool execution)"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input',default='', help='Input argument. It can be a single .mon file or a folder that contain .mon files. In the case of a folder, the .mon files are searched recursively, and the time-series are resampled/interpolated/combined to display a single graph with the aggregated CPU/MEM usage', type=str, required=True)
-    parser.add_argument('-r', '--resampling',default=None, help='Resampling of the time series (it input is a folder, resampling must be higher than 5)', type=int, required=False)
+    parser.add_argument('-r', '--resampling',default=None, help='Resampling in seconds of the time series (it input is a folder, resampling must be higher than 2 seconds)', type=int, required=False)
     parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
     return parser
 

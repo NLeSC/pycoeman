@@ -1,0 +1,9 @@
+<Hosts>
+  <Host>
+    <name> localhost </name>
+    <user> oscarr </user>
+    <setenv> /home/oscarr/improphoto/sw/export_paths.sh </setenv>
+    <numcommands> 2 </numcommands>
+    <exedir> /home/oscarr/improphoto/sw/pycoeman/tests/parcommands_ssh_test_exe_remote </exedir>
+  </Host>
+</Hosts>

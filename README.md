@@ -91,6 +91,31 @@ The tools in `parcommands/run_parcommands_sge_cluster` are used to run parallel 
 
 The tool `parcommands/run_parcommands_sge_cluster/create_parcommands_sge_jobs.py` creates the submission script. This tool requires to specify the data directory, a setenv file and local output directory. All these files and folders and the XML configuration file must be in a shared folder. The tool also requires to specify a remote execution directory. This is the directory in each remote node where the execution of the commends will be done. To submit the different jobs to the queueing system, run the produced submission script.
 
+It is assumed that the software locations are shared between all the nodes and that the setenv file will set the environment properly in all the nodes.
+
+### Parallel commands in remote hosts with ssh
+
+The tool `parcommands/run_parcommands_ssh.py` is used to run parallel commands in remote hosts. The commands to run are specified by the parallel commands XML configuration file. And the hosts to use are specified by the hosts XML file. An example of the hosts XML file follows:
+
+```
+<Hosts>
+  <Host>
+    <name> localhost </name>
+    <user> oscarr </user>
+    <setenv> /home/oscarr/.bashrc </setenv>
+    <numcommands> 4 </numcommands>
+    <exedir> /home/oscarr/test_remote_ssh </exedir>
+  </Host>
+</Hosts>
+```
+
+For each remote host we want to use we need to add a `<Host>` XML element. The `<name>` is its host name. `<user>` is the user in the remote host, `<setenv>` is a file in the remote host that is "sourced" before the execution of any command. `<numcommands>` is the number of commands that we want to simultaneously run in the remote host, and `<exedir>` is the directory in the remote host where the commands will be executed. Each command will be executed in `<exedir>/<commandId>`.
+
+IMPORTANT:
+ - The host name must be a valid ssh-reachable host name. It is assumed that password-less connections are possible with all the involved hosts. So, before running `parcommands/run_parcommands_ssh.py` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
+  - It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at lest this file must load pycoeman.
+
+
 ### Monitoring
 
 For both sequential and parallel commands, during the execution of each command of the specified in the XML configuration file, the CPU, memory and disk usage of the system are monitored. Note that this include monitoring of ALL the processes running at the system while the command is executed. Monitoring files are created in the execution folder. Concretely a .mon file, a .mon.disk and a .log file. The first one contains CPU/MEM usage monitoring, the second one contains disk usage monitoring and the third one is the log produced by the executed command. To get statistics of .mon files use `monitor/get_monitor_nums.py` and to get a plot use `monitor/plot_cpu_mem.py`. To plot the .mon.disk use `monitor/plot_disk.py`.

@@ -23,7 +23,7 @@ def executeCommandMonitor(commandId, command, diskPath, onlyPrint=False):
         # TODO: if execution folder is in different file system that source data, right now we only monitor raw data usage
     return (logFileName,monitorLogFileName,monitorDiskLogFileName)
 
-def initExecutionFolder(dataDir, executionFolder, elements, resume = False):
+def initExecutionFolderLocal(executionFolder, elementsAbsPaths, resume = False):
     # Create directory for this execution
     executionFolderAbsPath = os.path.abspath(executionFolder)
 
@@ -34,17 +34,10 @@ def initExecutionFolder(dataDir, executionFolder, elements, resume = False):
         os.makedirs(executionFolderAbsPath)
 
     # Create links for the files/folder specifed in require and requirelist XML
-    for element in elements:
-        if element.endswith('/'):
-            element = element[:-1]
-        if element.startswith('/'):
-            elementAbsPath = element
-        else:
-            elementAbsPath = dataDir + '/' + element
-        if os.path.isfile(elementAbsPath) or os.path.isdir(elementAbsPath):
-            os.symlink(elementAbsPath , os.path.join(executionFolderAbsPath, os.path.basename(elementAbsPath)))
-        else:
-            raise Exception(element + ' does not exist!')
+    for elementAbsPath in elementsAbsPaths:
+        # Existance of the elementAbsPath has been checked before
+        os.symlink(elementAbsPath , os.path.join(executionFolderAbsPath, os.path.basename(elementAbsPath)))
+
 
 def getRequiredList(requiredListFile):
     required = []
@@ -62,3 +55,65 @@ def apply_argument_parser(argumentsParser, options=None):
     else:
         args = argumentsParser.parse_args()
     return args
+
+def parseComponent(componentInfo, dataAbsPath):
+    # Mandatory tags
+    commandId = componentInfo.find("id").text.strip()
+    if commandId.count(' '):
+        raise Exception('Command IDs cannot contain whitespaces!')
+
+    command = componentInfo.find("command").text.strip()
+
+    # Optional tags
+    requiredTag = componentInfo.find("require")
+    requiredElements = []
+    if requiredTag != None:
+        requiredElements = requiredTag.text.strip().split()
+
+    requiredListTag = componentInfo.find("requirelist")
+    if requiredListTag != None:
+        requiredListFile = requiredListTag.text.strip()
+        requiredElements.extend(getRequiredList(dataAbsPath + '/' + requiredListFile))
+
+    for i in range(len(requiredElements)):
+        requiredElement = requiredElements[i]
+        if requiredElement.endswith('/'):
+            requiredElement = requiredElement[:-1]
+        if requiredElement.startswith('/'):
+            requiredElementAbsPath = requiredElement
+        else:
+            requiredElementAbsPath = dataAbsPath + '/' + requiredElement
+
+        if not os.path.exists(requiredElementAbsPath):
+            raise Exception(requiredElementAbsPath + ' does not exist!')
+
+        requiredElements[i] = requiredElementAbsPath
+
+    outputTag = componentInfo.find("output")
+    outputElements = []
+    if outputTag != None:
+        outputElements = outputTag.text.strip().split()
+        for i in range(len(outputElements)):
+            if outputElements[i].startswith('/'):
+                raise Exception('outputElements must use relative paths!')
+            if outputElements[i].endswith('/'):
+                outputElements[i] = outputElements[i][:-1]
+
+    return (commandId, command, requiredElements, outputElements)
+
+
+def parseHost(hostInfo):
+    hostName = hostInfo.find("name").text.strip()
+    hostUser = hostInfo.find("user").text.strip()
+    hostSetenv = hostInfo.find("setenv").text.strip()
+    hostNumCommands = int(hostInfo.find("numcommands").text.strip())
+    hostExeDir = hostInfo.find("exedir").text.strip()
+    if hostExeDir[0] != '/':
+        raise Exception('remoteexedir must be an absolute path!')
+    if hostSetenv[0] != '/':
+        raise Exception('setenv must be an absolute path!')
+    return (hostName, hostUser, hostSetenv, hostNumCommands, hostExeDir)
+
+def sshExecute(ssh, command):
+    stdin, stdout, stderr = ssh.exec_command(command)
+    return '\n'.join(stderr.readlines() + stdout.readlines())

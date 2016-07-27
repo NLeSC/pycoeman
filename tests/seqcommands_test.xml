@@ -1,0 +1,22 @@
+<SeqCommands>
+  <Component>
+    <id> ls </id>
+    <requirelist>testdata/testlist.txt</requirelist>
+    <require>testdata/testfilea testdata/testfileb testdata/testfoldera</require>
+    <command> pwd; ls -l * ; sleep 2</command>
+  </Component>
+  <Component>
+    <id> cat1 </id>
+    <command> cat testfile* testfoldera/* ; sleep 3</command>
+  </Component>
+  <Component>
+    <id> cp1 </id>
+    <require>testdata/testfilec</require>
+    <command> cp testfilec testfilec_copy; echo "testfilec copied!" ; sleep 4</command>
+  </Component>
+  <Component>
+    <id> cp2 </id>
+    <require>testdata/testfiled</require>
+    <command> cp testfiled testfiled_copy; echo "testfiled copied!" ; sleep 5</command>
+  </Component>
+</SeqCommands>

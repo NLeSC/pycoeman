@@ -15,13 +15,11 @@ def runChild(childIndex, commandsQueue, resultsQueue, dataAbsPath, executionFold
         if job == None:
             kill_received = True
         else:
-            [commandId, command, requiredListFile, requiredElements, outputElements] = job
-
-            listRequired = utils_execution.getRequiredList(dataAbsPath + '/' + requiredListFile)
+            [commandId, command, requiredElements, _] = job
 
             # Create a working directory using the specified remoteExeDir
             executionFolderCommandAbsPath = executionFolderAbsPath + '/' + commandId
-            utils_execution.initExecutionFolder(dataAbsPath, executionFolderCommandAbsPath, requiredElements + listRequired)
+            utils_execution.initExecutionFolderLocal(executionFolderCommandAbsPath, requiredElements)
             os.chdir(executionFolderCommandAbsPath)
 
             # Run the execution of the command (which includes cpu, mem and disk monitoring)
@@ -41,20 +39,21 @@ def run(dataDir, exeDir, configFile, numProc, onlyShowCommands):
 
     # Read configuration of commands to execute
     e = etree.parse(configFile).getroot()
-    mmComponents = e.findall('Component')
+    componentsInfo = e.findall('Component')
 
+    # create Queue for the commands to be executed
     commandsQueue = multiprocessing.Queue()
 
-    for mmComponent in mmComponents:
-        # Run component of workflow
-        commandId = mmComponent.find("id").text.strip()
-        if commandId.count(' '):
-            raise Exception('Command IDs cannot contain whitespaces!')
-        command = mmComponent.find("command").text.strip()
-        requiredListFile = mmComponent.find("requirelist").text.strip()
-        requiredElements= mmComponent.find("require").text.strip().split()
-        outputElements = mmComponent.find("output").text.strip().split()
-        commandsQueue.put([commandId, command, requiredListFile, requiredElements, outputElements])
+    # Check unique commandsIds and add commands to Queue
+    commandsIds = []
+    for componentInfo in componentsInfo:
+        # Add component to run in the Queue
+        (commandId, command, requiredElements, outputElements) = utils_execution.parseComponent(componentInfo, dataAbsPath)
+        if commandId in commandsIds:
+            raise Exception('Duplicated commandId ' + commandId + '. commandId must be unique!')
+        commandsIds.append(commandId)
+        commandsQueue.put([commandId, command, requiredElements, outputElements])
+    # For each core (of the total) we add a None to indicate each child to die
     for i in range(numProc):
         commandsQueue.put(None)
 
@@ -65,7 +64,7 @@ def run(dataDir, exeDir, configFile, numProc, onlyShowCommands):
         children[-1].start()
 
     results = []
-    for mmComponent in mmComponents:
+    for i in range(len(commandsIds)):
         [commandId,] = resultsQueue.get()
         print(commandId + ' finished!')
 

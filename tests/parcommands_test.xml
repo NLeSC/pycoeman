@@ -1,0 +1,26 @@
+<ParCommands>
+  <Component>
+    <id>command1</id>
+    <requirelist>testdata/testlist.txt</requirelist>
+    <command> cat testfile* ; sleep 3</command>
+    <output>testfile0 testfile1</output>
+  </Component>
+  <Component>
+    <id>command2</id>
+    <require>testdata/testfoldera</require>
+    <command> cat testfoldera/* ; sleep 3 </command>
+    <output>testfoldera/testfileaa</output>
+  </Component>
+  <Component>
+    <id>command3</id>
+    <require>testdata/testfilea testdata/testfileb </require>
+    <command> cat testfile* ; sleep 3</command>
+    <output> testfilea testfileb</output>
+  </Component>
+  <Component>
+    <id>command4</id>
+    <require>testdata/testfilec testdata/testfiled </require>
+    <command> cat testfile* ; sleep 3</command>
+    <output> testfilec testfiled</output>
+  </Component>
+</ParCommands>

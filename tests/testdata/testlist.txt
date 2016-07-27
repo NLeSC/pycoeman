@@ -1,0 +1,6 @@
+testdata/testfile0
+testdata/testfile1
+testdata/testfile2
+testdata/testfile3
+testdata/testfile4
+testdata/testfile5

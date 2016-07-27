@@ -13,30 +13,30 @@ def run(dataDir, exeDir, configFile, onlyShowCommands, resume):
 
     # Read configuration of commands to execute
     e = etree.parse(configFile).getroot()
-    mmComponents = e.findall('Component')
+    componentsInfo = e.findall('Component')
+
+    # Check for duplicated commandIds and compile list of all required elements
+    commandsIds = []
+    commands = []
+    requiredElementsAll = []
+    for componentInfo in componentsInfo:
+        (commandId, command, requiredElements, _) = utils_execution.parseComponent(componentInfo, dataAbsPath)
+        if commandId in commandsIds:
+            raise Exception('Duplicated commandId ' + commandId + '. commandId must be unique!')
+        commandsIds.append(commandId)
+        commands.append(command)
+        requiredElementsAll.extend(requiredElements)
 
     # Initialize execution folder (i.e. create links)
-    elements = []
-    for mmComponent in mmComponents:
-        typeToLinkComponent = mmComponent.find("require")
-        if typeToLinkComponent != None:
-            elements += typeToLinkComponent.text.strip().split()
-        typeToLinkComponent = mmComponent.find("requirelist")
-        if typeToLinkComponent != None:
-            elements += utils_execution.getRequiredList(typeToLinkComponent.text.strip())
-    utils_execution.initExecutionFolder(dataAbsPath, executionFolderAbsPath, elements, resume)
+    utils_execution.initExecutionFolderLocal(executionFolderAbsPath, requiredElementsAll, resume)
 
     if not onlyShowCommands:
         # Change directory to execution folder
         os.chdir(executionFolderAbsPath)
 
-    for mmComponent in mmComponents:
+    for i in range(len(commandsIds)):
         # Run component
-        commandId = mmComponent.find("id").text.strip()
-        if commandId.count(' '):
-            raise Exception('Command IDs cannot contain whitespaces!')
-        command = mmComponent.find("command").text.strip()
-        utils_execution.executeCommandMonitor(commandId, command, dataAbsPath, onlyShowCommands)
+        utils_execution.executeCommandMonitor(commandsIds[i], commands[i], dataAbsPath, onlyShowCommands)
 
     # Change directory to initial folder
     os.chdir(cwd)
