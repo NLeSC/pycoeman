@@ -111,6 +111,8 @@ The tool `parcommands/run_parcommands_ssh.py` is used to run parallel commands i
 
 For each remote host we want to use we need to add a `<Host>` XML element. The `<name>` is its host name. `<user>` is the user in the remote host, `<setenv>` is a file in the remote host that is "sourced" before the execution of any command. `<numcommands>` is the number of commands that we want to simultaneously run in the remote host, and `<exedir>` is the directory in the remote host where the commands will be executed. Each command will be executed in `<exedir>/<commandId>`.
 
+The required data is send to the remote nodes using SCP.
+
 IMPORTANT:
  - The host name must be a valid ssh-reachable host name. It is assumed that password-less connections are possible with all the involved hosts. So, before running `parcommands/run_parcommands_ssh.py` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
   - It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at lest this file must load pycoeman.
