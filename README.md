@@ -4,9 +4,9 @@ Python Commands Execution Manager
 
 pycoeman is a Python toolkit for executing command-line commands. It allows the execution of:
 
-- Sequential commands: this is a chain of command-line commands which will be executed one after the other. In other words, this is a set of commands that you would traditionally execute in a Bash script. Normally there is IO dependencies between commands (one command requires the output from one or previous ones).
+- Sequential commands: this is a chain of command-line commands which will be executed one after the other. In other words, this is a set of commands that you would traditionally execute in a Bash script. Normally there are IO dependencies between commands (one command requires the output from one or previous ones).
 
-- Parallel commands: this is a set of command-line commands which are executed in parallel. In other words, this is a set of commands that you would traditionally execute in a Bash script with all the commands as background jobs (with the & at the end). There can not be IO dependencies between commands. This is can be useful for tools which are single-core at programming level but can be parallelized at data level and usually require some final merging process, i.e. the processing of a large dataset can be tackled doing multiple processing of small chunks of the large dataset and in the end combining the outputs.
+- Parallel commands: this is a set of command-line commands which are executed in parallel. In other words, this is a set of commands that you would traditionally execute in a Bash script with all the commands as background jobs (with the & at the end). There cannot be IO dependencies between commands. This is can be useful for in tools which are single-core at programming level but can be parallelized at data level and usually require some final merging process, i.e. the processing of a large dataset can be tackled doing multiple processing of small chunks of the large dataset and in the end combining the outputs. 
 
 pycoeman adds CPU/MEM/disk monitoring during the execution of the commands and it allows to create clean execution environments for easier management of your executions (the commands will be executed in different folders separated from where the input data is). pycoeman has tools to run both sequential and parallel commands locally (in the local computer), and also to run parallel commands in a set of remote hosts accessible via SSH as well as in SGE clusters (computer clusters with Sun Grid Engine batch-queuing system). pycoeman is configured using XML files.
 
@@ -114,8 +114,8 @@ For each remote host we want to use we need to add a `<Host>` XML element. The `
 The required data is send to the remote nodes using SCP.
 
 IMPORTANT:
- - The host name must be a valid ssh-reachable host name. It is assumed that password-less connections are possible with all the involved hosts. So, before running `parcommands/run_parcommands_ssh.py` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
-  - It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at lest this file must load pycoeman.
+ - The host name must be a valid ssh-reachable host name. It is assumed that password-less ssh connections are possible with all the involved hosts. So, before running `parcommands/run_parcommands_ssh.py` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
+- It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at least this file must load pycoeman.
 
 
 ### Monitoring
