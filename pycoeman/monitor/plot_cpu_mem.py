@@ -13,7 +13,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
         availMap[hostname] = (numcores, memtotal)
     else:
         if resampling == None or resampling < 2:
-            raise Exception('Resampling must be higher than 5 if combining monitor files!')
+            raise Exception('Resampling must at least 2 seconds if combining monitor files!')
 
         monFiles = [os.path.join(dirpath, f)
             for dirpath, dirnames, files in os.walk(inputArgument)
@@ -39,7 +39,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
             else:
                 df = df.add(dfMap[hostname], fill_value=0)
 
-    print('Elapsed time: ' + str((df.index[-1] - df.index[0]).total_seconds()))
+    print('Elapsed time: ' + str((df.index.max() - df.index.min()).total_seconds()))
     print('Avg. CPU: ' + '%0.2f' % df['CPU'].mean())
     print('Avg. MEM [GB]: ' + '%0.2f' % df['MEM'].mean())
     print('Numger used hosts: ' + str(len(availMap)))

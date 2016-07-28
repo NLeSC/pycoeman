@@ -54,13 +54,13 @@ def readFile(fileName, resampling = None, ignoreLargeJumps = False):
         df = df.resample(str(resampling) + 's').mean()
     return (df, hostname.strip(), numcores, memtotal)
 
-def run(tools, folders, ignoreLargeJumps):
+def run(tools, folders, ignoreLargeJumps, includeMissing):
 
     tools = tools.split(',')
     folders = folders.split(',')
 
     table = []
-    header = ['#Tool', 'Name', 'Time[s]', 'Avail. CPU', 'Max. CPU', 'Mean CPU', 'Avail. MEM[GB]', 'Max. MEM[GB]', 'Mean MEM[GB]']
+    header = ['#Command', 'ExeFolder', 'Time[s]', 'Avail. CPU', 'Max. CPU', 'Mean CPU', 'Avail. MEM[GB]', 'Max. MEM[GB]', 'Mean MEM[GB]']
 
     for tool in tools:
         for folder in folders:
@@ -68,8 +68,8 @@ def run(tools, folders, ignoreLargeJumps):
             if os.path.isfile(monFileNanme):
                 (df, _, numcores, memtotal)  = readFile(monFileNanme, ignoreLargeJumps=ignoreLargeJumps)
                 pattern = "%0.2f"
-                table.append([tool, folder, pattern % (df.index[-1] - df.index[0]).total_seconds(), pattern % (numcores * 100.), pattern % df['CPU'].max(), pattern % df['CPU'].mean(), pattern % memtotal, pattern % df['MEM'].max(), pattern % df['MEM'].mean()])
-            else:
+                table.append([tool, folder, pattern % (df.index.max() - df.index.min()).total_seconds(), pattern % (numcores * 100.), pattern % df['CPU'].max(), pattern % df['CPU'].mean(), pattern % memtotal, pattern % df['MEM'].max(), pattern % df['MEM'].mean()])
+            elif includeMissing:
                 table.append([tool, folder] + ['-'] * (len(header) - 2))
 
     print("##########################")
@@ -85,12 +85,13 @@ def argument_parser():
     parser.add_argument('-t', '--tools',default='', help='Comma-separated list of command ids (it is expected that in each execution folder there is a <command id>.mon for each specified command id)', type=str, required=True)
     parser.add_argument('-f', '--folders',default='', help='Comma-separated list of execution folders where to look for the .mon files', type=str, required=True)
     parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
+    parser.add_argument('--includeMissing', default=False, help='If enabled, it includes missing commands in the execution folders [default is disabled]', action='store_true')
     return parser
 
 def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
-        run(a.tools, a.folders, a.ignoreLargeJumps)
+        run(a.tools, a.folders, a.ignoreLargeJumps, a.includeMissing)
     except Exception as e:
         print(e)
 
