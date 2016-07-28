@@ -1,5 +1,5 @@
  #!/usr/bin/python
-import sys, os, math, argparse
+import sys, os, argparse
 import numpy
 import pandas
 import matplotlib.pyplot as plt
@@ -20,9 +20,8 @@ def run(inputArgument, resampling, ignoreLargeJumps):
             for f in files if f.endswith('.mon')]
 
         dfMap = {}
-        for i in range(len(monFiles)):
-            # print(monFiles[i])
-            (df_mon, hostname, numcores, memtotal)  = get_monitor_nums.readFile(monFiles[i], resampling, ignoreLargeJumps)
+        for i, monFile in enumerate(monFiles):
+            (df_mon, hostname, numcores, memtotal)  = get_monitor_nums.readFile(monFile, resampling, ignoreLargeJumps)
             availMap[hostname] = (numcores, memtotal)
             df_inter = df_mon.interpolate(method='time')
             # print(str(df_inter.index[0]) + ' ' + str(df_inter.index[-1]))
@@ -34,8 +33,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
 
         hostnames = list(dfMap.keys())
         df = None
-        for i in range(len(hostnames)):
-            hostname = hostnames[i]
+        for i, hostname in enumerate(hostnames):
             if i == 0:
                 df = dfMap[hostname]
             else:
@@ -71,9 +69,12 @@ def argument_parser():
     parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
     return parser
 
-if __name__ == "__main__":
+def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
         run(a.input, a.resampling, a.ignoreLargeJumps)
     except Exception as e:
         print(e)
+        
+if __name__ == "__main__":
+    main()

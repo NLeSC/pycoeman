@@ -79,6 +79,8 @@ def run(osExeCommand, logFile, monitorFile, monitorDiskFile, diskMountPoint):
 
 if __name__ == "__main__":
     osExeCommand = sys.argv[1]
-    monitorFile = sys.argv[2]
-    diskMountPoint = sys.argv[3]
-    run(osExeCommand, monitorFile, diskMountPoint)
+    logFile = sys.argv[2]
+    monitorFile = sys.argv[3]
+    monitorDiskFile = sys.argv[4]
+    diskMountPoint = sys.argv[5]
+    run(osExeCommand, logFile, monitorFile, monitorDiskFile, diskMountPoint)

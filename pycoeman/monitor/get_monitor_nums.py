@@ -78,7 +78,6 @@ def run(tools, folders, ignoreLargeJumps):
     print(tabulate(table, headers=header))
     print()
 
-
 def argument_parser():
    # define argument menu
     description = "Get elapsed time and CPU/MEM stats for commands executed using pycoeman."
@@ -88,9 +87,12 @@ def argument_parser():
     parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
     return parser
 
-if __name__ == "__main__":
+def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
         run(a.tools, a.folders, a.ignoreLargeJumps)
     except Exception as e:
         print(e)
+
+if __name__ == "__main__":
+    main()
