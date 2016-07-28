@@ -20,7 +20,7 @@ pycoeman is used by pymicmac (https://github.com/ImproPhoto/pymicmac)
 Clone this repository and install it with pip (using a virtualenv is recommended):
 
 ```
-git clone https://github.com/oscarmartinezrubi/pycoeman
+git clone https://github.com/NLeSC/pycoeman
 cd pycoeman
 pip install .
 ```
@@ -28,7 +28,7 @@ pip install .
 Or installed directly with:
 
 ```
-pip install git+https://github.com/oscarmartinezrubi/pycoeman
+pip install git+https://github.com/NLeSC/pycoeman
 ```
 
 Python dependencies: numpy, tabulate, matplotlib, lxml, pandas. These are automatically installed by `pip install .` but some system libraries have to be installed: freetype, libssl-dev, libffi-dev
