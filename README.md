@@ -22,7 +22,7 @@ cd pycoeman
 pip install .
 ```
 
-Python dependencies: numpy, tabulate, matplotlib, lxml, pandas. These are automatically installed by `pip install .` but some system libraries have to be installed (for example freetype is required by matplotlib and may need to be installed by the system admin)
+Python dependencies: numpy, tabulate, matplotlib, lxml, pandas. These are automatically installed by `pip install .` but some system libraries have to be installed: freetype, libssl-dev, libffi-dev
 
 For now pycoeman works only in Linux systems. Requires Python 3.5.
 

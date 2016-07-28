@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.5"
+install:
+  - 'python setup.py develop'
+script:
+  - cd tests
+  - ./run_seqcommands_local_test.sh
+  - ./run_parcommands_local_test.sh
+sudo: false
+cache: pip

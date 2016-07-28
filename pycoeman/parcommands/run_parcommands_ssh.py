@@ -260,9 +260,12 @@ def argument_parser():
     parser.add_argument('--onlyShowCommands', default=False, help='If enabled, it does not execute the initialization of the execution folder (create links) and it only shows the commands without execute them [default is disabled]', action='store_true')
     return parser
 
-if __name__ == "__main__":
+def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
         run(a.dataDir, a.configFile, a.remoteHosts, a.localExeDir, a.localOutDir, a.onlyShowCommands)
     except Exception as e:
         print(e)
+        
+if __name__ == "__main__":
+    main()

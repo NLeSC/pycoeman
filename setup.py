@@ -10,6 +10,14 @@ setup(
     author_email='o.rubi@esciencecenter.nl',
     url='https://github.com/oscarmartinezrubi/pycoeman',
     install_requires=[
-          'numpy', 'tabulate', 'matplotlib', 'lxml', 'pandas'
+          'numpy', 'tabulate', 'matplotlib', 'lxml', 'pandas', 'paramiko', 'scp'
     ],
+    entry_points={
+        'console_scripts': [
+            'coeman-seq-local=pycoeman.seqcommands.run_seqcommands_local:main',
+            'coeman-par-local=pycoeman.parcommands.run_parcommands_local:main',
+            'coeman-par-ssh=pycoeman.parcommands.run_parcommands_ssh:main',
+            'coeman-par-sge=pycoeman.parcommands.run_parcommands_sge_cluster.create_parcommands_sge_jobs:main',
+        ],
+    },
 )
