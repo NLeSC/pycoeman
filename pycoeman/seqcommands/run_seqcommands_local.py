@@ -34,9 +34,9 @@ def run(dataDir, exeDir, configFile, onlyShowCommands, resume):
         # Change directory to execution folder
         os.chdir(executionFolderAbsPath)
 
-    for i in range(len(commandsIds)):
+    for i, commandId in enumerate(commandsIds):
         # Run component
-        utils_execution.executeCommandMonitor(commandsIds[i], commands[i], dataAbsPath, onlyShowCommands)
+        utils_execution.executeCommandMonitor(commandId, commands[i], dataAbsPath, onlyShowCommands)
 
     # Change directory to initial folder
     os.chdir(cwd)

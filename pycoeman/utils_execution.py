@@ -92,11 +92,11 @@ def parseComponent(componentInfo, dataAbsPath):
     outputElements = []
     if outputTag != None:
         outputElements = outputTag.text.strip().split()
-        for i in range(len(outputElements)):
-            if outputElements[i].startswith('/'):
+        for i, outputElement in enumerate(outputElements):
+            if outputElement.startswith('/'):
                 raise Exception('outputElements must use relative paths!')
-            if outputElements[i].endswith('/'):
-                outputElements[i] = outputElements[i][:-1]
+            if outputElement.endswith('/'):
+                outputElements[i] = outputElement[:-1]
 
     return (commandId, command, requiredElements, outputElements)
 
@@ -114,5 +114,5 @@ def parseHost(hostInfo):
     return (hostName, hostUser, hostSetenv, hostNumCommands, hostExeDir)
 
 def sshExecute(ssh, command):
-    stdin, stdout, stderr = ssh.exec_command(command)
+    _, stdout, stderr = ssh.exec_command(command)
     return '\n'.join(stderr.readlines() + stdout.readlines())

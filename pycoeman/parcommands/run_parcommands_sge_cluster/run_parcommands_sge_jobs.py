@@ -6,7 +6,6 @@ from pycoeman import utils_execution
 def run(dataDir, configFile, setEnvironmentFileToSource, remoteExeDir, localOutDir, qsuboptions):
     e = etree.parse(configFile).getroot()
     componentsInfo = e.findall('Component')
-    numComponents = len(componentsInfo)
 
     scriptsParentPath = os.path.dirname(os.path.realpath(__file__))
     executable = scriptsParentPath + '/run_parcommands_sge_job.sh'

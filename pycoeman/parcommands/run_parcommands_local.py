@@ -87,6 +87,6 @@ def main():
         run(a.dataDir, a.exeDir, a.configFile, a.numProc, a.onlyShowCommands)
     except Exception as e:
         print(e)
-    
+
 if __name__ == "__main__":
     main()

@@ -25,7 +25,7 @@ def getTotalMemGB():
 def addMonitorUsage(monFile):
     ti = time.time()
     command = "ps aux | awk '{sumC+=$3; sumM+=$4} END {print sumC,sumM}'"
-    (out,err) = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    (out,_) = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     (c,m) = out.decode("utf-8").split()
     c = float(c)
     m = float(m)

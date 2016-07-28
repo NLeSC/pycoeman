@@ -1,5 +1,5 @@
  #!/usr/bin/python
-import sys, os, argparse
+import os, argparse
 import numpy
 import pandas
 import matplotlib.pyplot as plt
@@ -47,7 +47,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
     print('Avail. CPU: ' + '%0.2f' % (100. * availCPU))
     print('Avail. MEM [GB]: ' + '%0.2f' % availMEM)
 
-    fig, ax1 = plt.subplots()
+    _, ax1 = plt.subplots()
     df['CPU'].plot(ax=ax1)
     ax1.set_xlabel('Time')
     ax1.set_ylabel('CPU [%]', color='b')
@@ -75,6 +75,6 @@ def main():
         run(a.input, a.resampling, a.ignoreLargeJumps)
     except Exception as e:
         print(e)
-        
+
 if __name__ == "__main__":
     main()

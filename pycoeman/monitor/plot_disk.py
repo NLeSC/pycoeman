@@ -1,5 +1,5 @@
  #!/usr/bin/python
-import sys, argparse
+import argparse
 import matplotlib.pyplot as plt
 import numpy
 from pymicmac import utils_execution

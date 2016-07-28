@@ -1,5 +1,5 @@
  #!/usr/bin/python
-import sys, numpy, os, argparse, pandas
+import numpy, os, argparse, pandas
 from tabulate import tabulate
 from pycoeman import utils_execution
 
@@ -66,7 +66,7 @@ def run(tools, folders, ignoreLargeJumps):
         for folder in folders:
             monFileNanme = folder + '/' + tool + '.mon'
             if os.path.isfile(monFileNanme):
-                (df, hostname, numcores, memtotal)  = readFile(monFileNanme, ignoreLargeJumps=ignoreLargeJumps)
+                (df, _, numcores, memtotal)  = readFile(monFileNanme, ignoreLargeJumps=ignoreLargeJumps)
                 pattern = "%0.2f"
                 table.append([tool, folder, pattern % (df.index[-1] - df.index[0]).total_seconds(), pattern % (numcores * 100.), pattern % df['CPU'].max(), pattern % df['CPU'].mean(), pattern % memtotal, pattern % df['MEM'].max(), pattern % df['MEM'].mean()])
             else:
