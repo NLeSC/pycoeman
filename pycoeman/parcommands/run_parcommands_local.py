@@ -1,5 +1,5 @@
  #!/usr/bin/python
-import os, argparse, shutil
+import os, argparse
 import multiprocessing
 from lxml import etree
 from pycoeman import utils_execution
@@ -63,7 +63,6 @@ def run(dataDir, exeDir, configFile, numProc, onlyShowCommands):
         children.append(multiprocessing.Process(target=runChild, args=(i, commandsQueue, resultsQueue, dataAbsPath, executionFolderAbsPath, onlyShowCommands)))
         children[-1].start()
 
-    results = []
     for i in range(len(commandsIds)):
         [commandId,] = resultsQueue.get()
         print(commandId + ' finished!')
@@ -88,6 +87,6 @@ def main():
         run(a.dataDir, a.exeDir, a.configFile, a.numProc, a.onlyShowCommands)
     except Exception as e:
         print(e)
-        
+    
 if __name__ == "__main__":
     main()

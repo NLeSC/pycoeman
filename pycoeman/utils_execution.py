@@ -75,8 +75,7 @@ def parseComponent(componentInfo, dataAbsPath):
         requiredListFile = requiredListTag.text.strip()
         requiredElements.extend(getRequiredList(dataAbsPath + '/' + requiredListFile))
 
-    for i in range(len(requiredElements)):
-        requiredElement = requiredElements[i]
+    for i, requiredElement in enumerate(requiredElements):
         if requiredElement.endswith('/'):
             requiredElement = requiredElement[:-1]
         if requiredElement.startswith('/'):

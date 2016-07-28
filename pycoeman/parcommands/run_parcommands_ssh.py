@@ -1,11 +1,9 @@
  #!/usr/bin/python
-import os, argparse, shutil
+import os, argparse
 import multiprocessing
 from lxml import etree
 import paramiko
-import scp
 from scp import SCPClient
-from lxml import etree
 from pycoeman import utils_execution
 
 def runCommand(commandConfFile):
@@ -235,7 +233,6 @@ def run(dataDir, configFile, hostsConfigFile, localExeDir, localOutDir, onlyShow
             children.append(multiprocessing.Process(target=runChild, args=(hostName, i, commandsQueue, resultsQueue, dataAbsPath, localExeDirAbsPath, localOutDirAbsPath, hostUser, hostSetenv, hostExeDir, onlyShowCommands)))
             children[-1].start()
 
-    results = []
     for i in range(len(commandsIds)):
         [commandId, hostName, childIndex, statusOk, message] = resultsQueue.get()
         if statusOk:
@@ -266,6 +263,6 @@ def main():
         run(a.dataDir, a.configFile, a.remoteHosts, a.localExeDir, a.localOutDir, a.onlyShowCommands)
     except Exception as e:
         print(e)
-        
+
 if __name__ == "__main__":
     main()
