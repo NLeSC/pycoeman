@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/NLeSC/pycoeman.svg?branch=master)](https://travis-ci.org/NLeSC/pycoeman)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/41716b834df24626a8cce742ac068fce)](https://www.codacy.com/app/omrubi/pycoeman?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=NLeSC/pycoeman&amp;utm_campaign=Badge_Grade)
+[![DOI](https://zenodo.org/badge/22553/NLeSC/pycoeman.svg)](https://zenodo.org/badge/latestdoi/22553/NLeSC/pycoeman)
 
 Python Commands Execution Manager
 
