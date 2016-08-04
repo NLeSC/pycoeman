@@ -6,7 +6,11 @@ import matplotlib.pyplot as plt
 from pycoeman import utils_execution
 from pycoeman.monitor import get_monitor_nums
 
-def run(inputArgument, resampling, ignoreLargeJumps):
+def run(inputArgument, outputFile, resampling, ignoreLargeJumps):
+    if outputFile != None:
+        if os.path.exists(outputFile):
+            raise Exception('Specified output file name already exists')
+
     availMap = {}
     if os.path.isfile(inputArgument):
         (df, hostname, numcores, memtotal)  = get_monitor_nums.readFile(inputArgument, resampling, ignoreLargeJumps)
@@ -47,7 +51,7 @@ def run(inputArgument, resampling, ignoreLargeJumps):
     print('Avail. CPU: ' + '%0.2f' % (100. * availCPU))
     print('Avail. MEM [GB]: ' + '%0.2f' % availMEM)
 
-    _, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots()
     df['CPU'].plot(ax=ax1)
     ax1.set_xlabel('Time')
     ax1.set_ylabel('CPU [%]', color='b')
@@ -58,13 +62,18 @@ def run(inputArgument, resampling, ignoreLargeJumps):
     ax2.set_ylabel('MEM [GB]', color='r')
     for tl in ax2.get_yticklabels():
         tl.set_color('r')
-    plt.show()
+
+    if outputFile == None:
+        plt.show()
+    else:
+        fig.savefig(outputFile)
 
 def argument_parser():
    # define argument menu
     description = "Plot the CPU/MEM usage of a command executed using pycoeman (it is possible to combine .mon files of Distributed Tool execution)"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input',default='', help='Input argument. It can be a single .mon file or a folder that contain .mon files. In the case of a folder, the .mon files are searched recursively, and the time-series are resampled/interpolated/combined to display a single graph with the aggregated CPU/MEM usage', type=str, required=True)
+    parser.add_argument('-o', '--output',default=None, help='Output image name [Optional]. By default the plot is interactive', type=str, required=False)
     parser.add_argument('-r', '--resampling',default=None, help='Resampling in seconds of the time series (it input is a folder, resampling must be higher than 2 seconds)', type=int, required=False)
     parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
     return parser
@@ -72,7 +81,7 @@ def argument_parser():
 def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
-        run(a.input, a.resampling, a.ignoreLargeJumps)
+        run(a.input, a.output, a.resampling, a.ignoreLargeJumps)
     except Exception as e:
         print(e)
 

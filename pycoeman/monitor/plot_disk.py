@@ -1,10 +1,13 @@
  #!/usr/bin/python
-import argparse
+import os, argparse
 import matplotlib.pyplot as plt
 import numpy
 from pymicmac import utils_execution
 
-def run(inputArgument):
+def run(inputArgument, outputFile):
+    if outputFile != None:
+        if os.path.exists(outputFile):
+            raise Exception('Specified output file name already exists')
 
     lines = open(inputArgument, 'r').read().split('\n')
 
@@ -22,25 +25,31 @@ def run(inputArgument):
     t = numpy.array(t)
     t = t - t[0]
 
+    fig = plt.figure()
     l1, = plt.plot(t, tots, 'r--')
     l2, = plt.plot(t, useds, 'b.-')
 
     plt.legend((l1, l2), ('Total Disk', 'Used Disk'), loc='upper right', shadow=True)
     plt.xlabel('Time [s]')
     plt.ylabel('Disk [MB]')
-    plt.show()
+
+    if outputFile == None:
+        plt.show()
+    else:
+        fig.savefig(outputFile)
 
 def argument_parser():
    # define argument menu
     description = "Plot the disk usage of a command executed pycoeman"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-i', '--input',default='', help='Input .mon.disk file', type=str, required=True)
+    parser.add_argument('-o', '--output',default=None, help='Output image name [Optional]. By default the plot is interactive', type=str, required=False)
     return parser
 
 def main():
     try:
         a = utils_execution.apply_argument_parser(argument_parser())
-        run(a.input)
+        run(a.input, a.output)
     except Exception as e:
         print(e)
 
