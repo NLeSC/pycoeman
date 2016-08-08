@@ -22,23 +22,16 @@ def getNumCores():
 def getTotalMemGB():
     return int(os.popen('free -b').read().split('\n')[1].split()[1]) / 1073741824
 
-def addMonitorUsage(monFile):
+def addMonitorUsage(monFile, parentpid = None):
     ti = time.time()
-    command = "ps aux | awk '{sumC+=$3; sumM+=$4} END {print sumC,sumM}'"
+    if parentpid != None:
+        command = "ps --forest --no-headers -o %cpu,%mem -g $(ps -o sid= -p " + str(parentpid) + ") | awk '{sumC+=$1; sumM+=$2} END {print sumC,sumM}'"
+    else:
+        command = "ps aux | awk '{sumC+=$3; sumM+=$4} END {print sumC,sumM}'"
     (out,_) = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     (c,m) = out.decode("utf-8").split()
     c = float(c)
     m = float(m)
-    # command = 'top -b -n 1 | grep mm3d'
-    # (out,err) = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    # lines = out.decode("utf-8").split("\n")
-    # c = 0
-    # m = 0
-    # for line in lines:
-    #     if line != '':
-    #         f = line.split()
-    #         c+=float(f[8])
-    #         m+=float(f[9])
     monFile.write(("%0.2f" % ti) + ' ' + ("%0.2f" % c) + ' ' + ("%0.2f" % m) + '\n')
     monFile.flush()
 
@@ -56,22 +49,24 @@ def run(osExeCommand, logFile, monitorFile, monitorDiskFile, diskMountPoint):
     o.write('#Number cores: ' + str(getNumCores()) + '\n')
     o.write('#System memory [GB]: ' + str(getTotalMemGB()) + '\n')
 
+    parentpid = os.getpid()
+
     # Add one usage before starting launching command
-    addMonitorUsage(o)
+    addMonitorUsage(o, parentpid)
     addMonitorDiskUsage(o2,  diskMountPoint)
 
     child = multiprocessing.Process(target=executeScript, args=(osExeCommand,logFile))
     child.start()
     counter = 0
     while child.is_alive():
-        addMonitorUsage(o)
+        addMonitorUsage(o, parentpid)
         if (counter % 50) == 0:
             addMonitorDiskUsage(o2, diskMountPoint)
         child.join(1)
         counter+=1
 
     # Add one usage after finishing launching command
-    addMonitorUsage(o)
+    addMonitorUsage(o, parentpid)
     addMonitorDiskUsage(o2, diskMountPoint)
 
     o.close()
