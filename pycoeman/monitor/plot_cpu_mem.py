@@ -22,26 +22,36 @@ def run(inputArgument, outputFile, resampling, ignoreLargeJumps):
         monFiles = [os.path.join(dirpath, f)
             for dirpath, dirnames, files in os.walk(inputArgument)
             for f in files if f.endswith('.mon')]
+        # 
+        # dfMap = {}
+        # for i, monFile in enumerate(monFiles):
+        #     (df_mon, hostname, numcores, memtotal)  = get_monitor_nums.readFile(monFile, resampling, ignoreLargeJumps)
+        #     availMap[hostname] = (numcores, memtotal)
+        #     df_inter = df_mon.interpolate(method='time')
+        #     # print(str(df_inter.index[0]) + ' ' + str(df_inter.index[-1]))
+        #     if hostname in dfMap:
+        #         dfConcat = df_inter.drop(df_inter.index.intersection(dfMap[hostname].index))
+        #         dfMap[hostname] = pandas.concat((dfMap[hostname], dfConcat))
+        #     else:
+        #         dfMap[hostname] = df_inter
+        #
+        # hostnames = list(dfMap.keys())
+        # df = None
+        # for i, hostname in enumerate(hostnames):
+        #     if i == 0:
+        #         df = dfMap[hostname]
+        #     else:
+        #         df = df.add(dfMap[hostname], fill_value=0)
 
-        dfMap = {}
+        df = None
         for i, monFile in enumerate(monFiles):
             (df_mon, hostname, numcores, memtotal)  = get_monitor_nums.readFile(monFile, resampling, ignoreLargeJumps)
             availMap[hostname] = (numcores, memtotal)
             df_inter = df_mon.interpolate(method='time')
-            # print(str(df_inter.index[0]) + ' ' + str(df_inter.index[-1]))
-            if hostname in dfMap:
-                dfConcat = df_inter.drop(df_inter.index.intersection(dfMap[hostname].index))
-                dfMap[hostname] = pandas.concat((dfMap[hostname], dfConcat))
-            else:
-                dfMap[hostname] = df_inter
-
-        hostnames = list(dfMap.keys())
-        df = None
-        for i, hostname in enumerate(hostnames):
             if i == 0:
-                df = dfMap[hostname]
+                df = df_inter
             else:
-                df = df.add(dfMap[hostname], fill_value=0)
+                df = df.add(df_inter, fill_value=0)
 
     print('Elapsed time: ' + str((df.index.max() - df.index.min()).total_seconds()))
     print('Avg. CPU: ' + '%0.2f' % df['CPU'].mean())
