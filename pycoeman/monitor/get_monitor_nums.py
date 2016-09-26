@@ -3,7 +3,7 @@ import numpy, os, argparse, pandas
 from tabulate import tabulate
 from pycoeman import utils_execution
 
-def readFile(fileName, resampling = None, ignoreLargeJumps = -1):
+def readFile(fileName, resampling = None, ignoreLargeJumps = False):
     lines = open(fileName, 'r').read().split('\n')
     numlines = len(lines)
 
@@ -33,15 +33,14 @@ def readFile(fileName, resampling = None, ignoreLargeJumps = -1):
                 t.append(float(fields[0]))
                 d.append((float(fields[1]),float(fields[2])))
 
-    if ignoreLargeJumps > 0:
+    if ignoreLargeJumps:
         t = numpy.array(t)
         diff = t[1:] - t[:-1]
         tn = []
         tn.append(t[0])
         acc = 0.
-        tJ = float(ignoreLargeJumps)
         for i in range(1,len(t)):
-            if diff[i-1] > tJ:
+            if diff[i-1] > 5.:
                 acc+=diff[i-1]
             tn.append(t[i] - acc)
         t = tn
@@ -85,7 +84,7 @@ def argument_parser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-t', '--tools',default='', help='Comma-separated list of command ids (it is expected that in each execution folder there is a <command id>.mon for each specified command id)', type=str, required=True)
     parser.add_argument('-f', '--folders',default='', help='Comma-separated list of execution folders where to look for the .mon files', type=str, required=True)
-    parser.add_argument('--ignoreLargeJumps', default=-1, help='If enabled, it ignores large time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]')
+    parser.add_argument('--ignoreLargeJumps', default=False, help='If enabled, it ignores large (> 5 seconds) time jumps in the monitor files. Use this for example when you were running your processes in a Virtual Machine and you had to suspend it for a while [default is disabled]', action='store_true')
     parser.add_argument('--includeMissing', default=False, help='If enabled, it includes missing commands in the execution folders [default is disabled]', action='store_true')
     return parser
 
