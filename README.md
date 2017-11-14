@@ -128,11 +128,7 @@ In the following example, *listimage.list* needs to be specified as *<requirelis
 </ParCommands>
 ```
 
-### Parallel commands locally
-
-It is possible to use the local computer to run parallel commands specified by the XML configuration files. Use the tool in `coeman-par-local` and specify the number of processes you wish to use. In this case, (soft) links will be created for each of the commands, which will be executed in their own execution folder.
-
-### Parallel commands in remote hosts with ssh
+#### Parallel commands in remote hosts with ssh
 
 The tool `coeman-par-ssh` is used to run parallel commands in remote hosts. The commands to run are specified by the parallel commands XML configuration file. And the hosts to use are specified by the hosts XML file. An example of the hosts XML file follows:
 
@@ -158,9 +154,14 @@ IMPORTANT:
 
 ### Parallel commands in SGE clusters
 
-The tool `coeman-par-sge` is used to run parallel commands specified by the XML configuration files in SGE clusters, it submits jobs to the cluster queuing system. SGE clusters usually have a shared folder where all the nodes can access. However, since massive simultaneous access to the shared folder is discouraged, usually local storage in the execution nodes is used when possible. For pycoeman to work properly, the required data must be in a location that can be accessed from all the cluster nodes computers. This tool requires to specify the data directory, a setenv file and local output directory. All these files and folders and the XML configuration file must be in a shared folder. The tool also requires to specify a remote execution directory. This is the directory in each remote node where the execution of the commends will be done. To submit the different jobs to the queuing system, run the produced submission script.
+The tools with the suffix `-sge` run commands in clusters with Sun Grid Engine (SGE) queuing system. SGE clusters are configured to have all the nodes with
+access to a shared folder. Having all nodes simultaneously reading and writing to the shared storage is discouraged. Hence, for performance reasons the user should
+copy the input data from the shared storage to the node's local storage and use a local directory to store command's outputs.
 
-It is assumed that the software locations are shared between all the nodes and that the setenv file will set the environment properly in all the nodes.
+To use `coeman-par-sge` the user needs to specify an execution directory, which should also be local, and a *setenv file* to set the environment at the remote machines.
+The *setenv* file and the XML configuration file should be placed at the shared folder. Once the user runs the `coeman-par-sge` tool its output is a submission script.
+The user should run it to submit the different jobs to a SGE queuing system. It is assumed that the software locations are shared between all the nodes and
+that the setenv file will set the environment properly in all the nodes.
 
 ### Monitoring
 
