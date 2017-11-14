@@ -1,4 +1,4 @@
- #!/usr/bin/python
+#!/usr/bin/python
 import os
 from pycoeman.monitor import monitor_cpu_mem_disk
 
