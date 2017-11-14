@@ -128,9 +128,13 @@ In the following example, *listimage.list* needs to be specified as *<requirelis
 </ParCommands>
 ```
 
-#### Parallel commands in remote hosts with ssh
+#### Remote execution using ssh
 
-The tool `coeman-par-ssh` is used to run parallel commands in remote hosts. The commands to run are specified by the parallel commands XML configuration file. And the hosts to use are specified by the hosts XML file. An example of the hosts XML file follows:
+The tools with the suffix `-ssh` are used to run commands in remote hosts. In addition to the XML configuration file, the user needs to specify the hosts
+XML file. The host XML file has a `<Host>` XML element per each host and five nested XML elements: the `<name>` to define host name, `<user>` 
+user name at the remote host, `<setenv>` to set environment before each command execution at the remote host, `<numcommands>` to define the number of
+commands executed in simultaneously, and `<exedir>` specifies the root directory for each command's execution directory (each command will then use
+`<exedir>/<commandId>` as execution directory). An example of the hosts XML file follows:
 
 ```
 <Hosts>
@@ -144,13 +148,14 @@ The tool `coeman-par-ssh` is used to run parallel commands in remote hosts. The 
 </Hosts>
 ```
 
-For each remote host we want to use we need to add a `<Host>` XML element. The `<name>` is its host name. `<user>` is the user in the remote host, `<setenv>` is a file in the remote host that is "sourced" before the execution of any command. `<numcommands>` is the number of commands that we want to simultaneously run in the remote host, and `<exedir>` is the directory in the remote host where the commands will be executed. Each command will be executed in `<exedir>/<commandId>`.
-
-The required data is send to the remote nodes using SCP.
-
-IMPORTANT:
- - The host name must be a valid ssh-reachable host name. It is assumed that password-less ssh connections are possible with all the involved hosts. So, before running `coeman-par-ssh` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
-- It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at least this file must load pycoeman.
+**IMPORTANT:**
+* All the required data is sent to the remote nodes using SCP, therefore, the host name must be a valid ssh-reachable host name. It is assumed that
+password-less ssh connections are possible with all the involved hosts. So, before running `coeman-par-ssh` make sure this is the case. To set password-less
+connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in
+`~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
+* It is assumed that pycoeman and all software required by each commands is installed on all remote hosts.
+* The file specified by `<setenv>` is used to load the environment at the remote hosts. Hence, the user should make sure all the dependencies, including
+*pycoeman* are loaded through `<setenv>`. The same holds for environment variables.
 
 ### Parallel commands in SGE clusters
 
