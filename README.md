@@ -59,19 +59,17 @@ The installation makes the following command-line tools available: `coeman-seq-l
 
 ## Deployment
 
-Pycoeman deploys either at the user's computer (*local*) or at a set of remote machines (*remote*). 
-With *Pycoeman* user's commands are executed either in *sequential mode* or *parallel mode*. Independent from the execution mode, the commands
-are either executed at the user's computer (commands with *-local* suffix) or distributed among a set of machines (commands with either *-ssh*
-or *-sge* suffix). The ones with *-ssh* suffix use **ssh** to run commands at the remote hosts. The ones with *-sge* suffix submit the commands
-as jobs to a Sun Grid Engine queuing system.
+With *Pycoeman* user's commands are executed either in *sequential mode* or *parallel mode*. The commands, their arguments and the required files/directories
+are listed in a XML configuration file. Independent from the execution mode, the commands are either executed at the user's computer (commands with *-local*
+suffix) or distributed among a set of machines (commands with either *-ssh* or *-sge* suffix). The ones with *-ssh* suffix use **ssh** to run commands at the
+remote hosts. The ones with *-sge* suffix submit the commands as jobs to a Sun Grid Engine queuing system.
 
-### Sequential mode.
+### Sequential mode
 
-Commands to be executed in sequential mode are listed in a XML configuration file. The sequential commands XML configuration file must contain
-a root tag `<SeqCommands>` and for each command a XML element `<Component>` is added with two mandatory nested XML elements, `<id>` and `<command>`.
-Dependencies on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder
-for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified
-comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in
+The sequential commands XML configuration file must contain a root tag `<SeqCommands>` and for each command a XML element `<Component>` is added with two
+mandatory nested XML elements, `<id>` and `<command>`. Dependencies on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft)
+links are created in the execution folder for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and
+they are specified comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in
 a separate ASCII file, one file/folder per line. Both `<require>` and `<requirelist>` can be simultaneously used.  
 
 Once the sequential mode XML configuration file is defined the user should use the tools `coeman-seq-[local | ssh | sge]` to execute them. For
@@ -93,16 +91,24 @@ for one of the commands (using `<require>` or `<requirelist>`) they don't need t
 </SeqCommands>
 ```
 
-## Parallel commands
+### Parallel mode
 
-Parallel commands can be executed with pycoeman. Which commands are executed is specified with a XML configuration file. Then, the tool `coeman-par-local` can be used to run the sequence of commands in the local machine. The tool `coeman-par-ssh` can be used to run commands in remote hosts accessible via ssh. And the tool `coeman-par-sge` can be used to run the commands in a SGE cluster.
+The parallel commands XML configuration file must contain a root tag `<ParCommands>` and for each command a XML element `<Component>` is added with three
+mandatory nested XML elements, `<id>`, `<command>` and `<output>`. The latter determines which files and directories should be collected as output. Dependencies
+on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder for the specified
+files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified comma-separated. Using `<requirelist>`
+is recommended when the number of required files/folders is large. In this case they are specified in a separate ASCII file, one file/folder per line.
+Both `<require>` and `<requirelist>` can be simultaneously used.  
 
-The parallel commands XML configuration file must contain a root tag `<ParCommands>`. Then, for each commands we have to add a XML element `<Component>` which must have as child elements the `<id>` and a `<command>` elements. This is the same as the sequential commands XML configuration file format. However, in this case each `<Component>` tag must also contain a `<output>`, which determines which files or folder are the output. Like in the sequential commands XML configuration file format, `<requirelist>` and `<require>` are also used to define the required data by each command.
+Once the parallel mode XML configuration file is defined the user should use the tools `coeman-par-[local | ssh | sge]` to execute them. When running a
+parallel mode, commands are executed in a different execution folder and possibly in a more than one computer. For each command, the required data is
+copied/linked from the location where the pycoeman tool is launched to the remote execution folders. After a successful execution of the commands, the
+files listed under the tag `<output>` are copied back to the location where the pycoeman tool was launched. 
 
-When running a parallel commands with pycoeman using `coeman-par-local`, `coeman-par-ssh` or `coeman-par-sge`, each command is executed in a different execution folder and possibly in a different computer. For each command, the required data is copied/linked from the location where the pycoeman tool is launched run is lunched to the remote execution folder, and then the command is executed. When the command is finished the elements indicated in `<output>` are copied back to the location where the pycoeman tool was launched. How the data is copied from the location where the pycoeman tool is launched to the remote execution folders (and vice-versa) depends on the used hardware systems.
-
-Note that in this case, the data indicated by `<require>` and `<requirelist>` is not shared between different commands execution. So, in each command `<require>` and `<requirelist>` must indicate ALL the required data. This is different than in the sequential commands execution where the required data can be shared by other commands since they are all executed in the same execution folder. An example XML configuration file:
-
+For data availability the execution model is share-nothing, i.e., the data indicated by `<require>` and `<requirelist>` is not shared between different
+commands execution. Hence, in each command `<require>` and `<requirelist>` must indicate ALL the required data. This is different than in the sequential
+commands execution where the required data from a *command A* can be shared with the other commands since they are all executed in the same execution folder.
+In the following example, *listimage.list* needs to be specified as *<requirelist>* for both *Executable1* and *Executable2* command.
 ```
 <ParCommands>
   <Component>
@@ -121,7 +127,6 @@ Note that in this case, the data indicated by `<require>` and `<requirelist>` is
   </Component>
 </ParCommands>
 ```
-
 
 ### Parallel commands locally
 
