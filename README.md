@@ -57,16 +57,27 @@ pip3 -r requirements.txt install pycoeman
 
 The installation makes the following command-line tools available: `coeman-seq-local`, `coeman-par-local`, `coeman-par-ssh` and `coeman-par-sge`
 
-## Sequential commands
+## Deployment
 
-Sequential commands can be executed with pycoeman. Which commands are executed is specified with a XML configuration file. Then, the tool `coeman-seq-local` can be used to run the sequence of commands in the local machine.
+Pycoeman deploys either at the user's computer (*local*) or at a set of remote machines (*remote*). 
+With *Pycoeman* user's commands are executed either in *sequential mode* or *parallel mode*. Independent from the execution mode, the commands
+are either executed at the user's computer (commands with *-local* suffix) or distributed among a set of machines (commands with either *-ssh*
+or *-sge* suffix). The ones with *-ssh* suffix use **ssh** to run commands at the remote hosts. The ones with *-sge* suffix submit the commands
+as jobs to a Sun Grid Engine queuing system.
 
-The sequential commands XML configuration file must contain a root tag `<SeqCommands>`. Then, for each command we have to add a XML element `<Component>` which must have as child elements at least a `<id>` and a `<command>` elements.
+### Sequential mode.
 
-Since the commands will be executed in an independent execution folder, if a command requires some files/folders, these have to be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in a separate ASCII file, one file/folder per line. Both `<require>` and `<requirelist>` can be simultaneously used.  
+Commands to be executed in sequential mode are listed in a XML configuration file. The sequential commands XML configuration file must contain
+a root tag `<SeqCommands>` and for each command a XML element `<Component>` is added with two mandatory nested XML elements, `<id>` and `<command>`.
+Dependencies on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder
+for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified
+comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in
+a separate ASCII file, one file/folder per line. Both `<require>` and `<requirelist>` can be simultaneously used.  
 
-It is important to notice that since all the commands are executed in the same execution folder, if a command in the sequence already 'linked' a file/folder (using `<require>` or `<requirelist>`) there is no need to do it again. An example XML configuration file:
-
+Once the sequential mode XML configuration file is defined the user should use the tools `coeman-seq-[local | ssh | sge]` to execute them. For
+local executions, it is important to notice that since all the commands are executed in the same execution folder file/folders already linked
+for one of the commands (using `<require>` or `<requirelist>`) they don't need to be linked again. In the following example, *inputfile1* and
+*inputfile2* are linked for *Executable1* and re-used for *Executable2*.
 ```
 <SeqCommands>
   <Component>
