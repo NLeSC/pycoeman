@@ -10,7 +10,7 @@ setup(
     author_email='o.rubi@esciencecenter.nl',
     url='https://github.com/NLeSC/pycoeman',
     install_requires=[
-          'numpy', 'tabulate', 'matplotlib', 'lxml', 'pandas', 'paramiko', 'scp'
+          'numpy', 'tabulate', 'matplotlib', 'lxml', 'pandas', 'scp', 'paramiko'
     ],
     entry_points={
         'console_scripts': [
