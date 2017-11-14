@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='pycoeman',
-    version='1.0.0',
+    version='1.1.0',
     packages=['pycoeman', 'pycoeman.seqcommands', 'pycoeman.parcommands', 'pycoeman.parcommands.run_parcommands_sge_cluster', 'pycoeman.monitor',],
     license='Apache License 2.0',
     long_description=open('README.md').read(),
