@@ -1,14 +1,6 @@
 #!/usr/bin/python
 import os
 from pycoeman.monitor import monitor_cpu_mem_disk
-import os,subprocess
-
-def getSize(absPath):
-    (out,err) = subprocess.Popen('du -sb ' + absPath, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    try:
-        return int(out.split()[0])
-    except:
-        return -1
 
 def executeCommandMonitor(commandId, command, diskPath, onlyPrint=False):
     # Define the names of the script that executes the command, the log file and the monitor file
