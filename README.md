@@ -6,6 +6,7 @@
 [![Build Status](https://travis-ci.org/NLeSC/pycoeman.svg?branch=master)](https://travis-ci.org/NLeSC/pycoeman)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/41716b834df24626a8cce742ac068fce)](https://www.codacy.com/app/omrubi/pycoeman?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=NLeSC/pycoeman&amp;utm_campaign=Badge_Grade)
 [![DOI](https://zenodo.org/badge/22553/NLeSC/pycoeman.svg)](https://zenodo.org/badge/latestdoi/22553/NLeSC/pycoeman)
+[![PyPI](https://img.shields.io/pypi/v/pycoeman.svg)](https://pypi.python.org/pypi/pycoeman/)
 
 Python Commands Execution Manager
 
@@ -30,6 +31,17 @@ To avoid issues with dependencies and versions, and indirectly permissions, the 
 sudo apt-get install freetype libssl-dev libffi-dev
 ```
 
+* Installing *pycoeman* package:
+```
+#If virtualenv is not installed:
+sudo apt-get install virtualenv
+
+virtualenv pycoeman_env
+. pycoeman_env/bin/activate
+
+pip3 install pycoeman
+```
+
 * Installing *pycoeman* from sources:
 ```
 git clone https://github.com/NLeSC/pycoeman
@@ -42,17 +54,6 @@ virtualenv pycoeman_env
 . pycoeman_env/bin/activate
 
 pip3 -r requirements.txt install .
-```
-
-* Installing *pycoeman* package:
-```
-#If virtualenv is not installed:
-sudo apt-get install virtualenv
-
-virtualenv pycoeman_env
-. pycoeman_env/bin/activate
-
-pip3 -r requirements.txt install pycoeman
 ```
 
 The installation makes the following command-line tools available: `coeman-seq-local`, `coeman-par-local`, `coeman-par-ssh` and `coeman-par-sge`
