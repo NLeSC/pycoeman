@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] - 2017-11-14
+
+### Changed
+- Add manifest for pypi
+
 ## [1.1.0] - 2017-11-14
 
 ### Changed
