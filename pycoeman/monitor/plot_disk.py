@@ -2,7 +2,7 @@
 import os, argparse
 import matplotlib.pyplot as plt
 import numpy
-from pymicmac import utils_execution
+from pycoeman import utils_execution
 
 def run(inputArgument, outputFile):
     if outputFile != None:
