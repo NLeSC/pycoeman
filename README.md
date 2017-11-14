@@ -21,23 +21,39 @@ pycoeman is used by pymicmac (https://github.com/ImproPhoto/pymicmac)
 
 ## Installation
 
-Clone this repository and install it with pip (using a virtualenv is recommended):
+For now pycoeman only works in Linux systems. It requires Python 3.5 and it is installed using pip.
+If Python 3.5 is not the default Python on user's system, the user should use **pip3** to install *pycoeman*.
+To avoid issues with dependencies and versions, and indirectly permissions, the use should use [**virtualenv**](https://virtualenv.pypa.io/en/stable/).
 
+* Installing system package dependencies
+```
+sudo apt-get install freetype libssl-dev libffi-dev
+```
+
+* Installing *pycoeman* from sources:
 ```
 git clone https://github.com/NLeSC/pycoeman
 cd pycoeman
-pip install .
+
+#If virtualenv is not installed:
+sudo apt-get install virtualenv
+
+virtualenv pycoeman_env
+. pycoeman_env/bin/activate
+
+pip3 -r requirements.txt install .
 ```
 
-Or installed directly with:
-
+* Installing *pycoeman* package:
 ```
-pip install git+https://github.com/NLeSC/pycoeman
+#If virtualenv is not installed:
+sudo apt-get install virtualenv
+
+virtualenv pycoeman_env
+. pycoeman_env/bin/activate
+
+pip3 -r requirements.txt install pycoeman
 ```
-
-Python dependencies: numpy, tabulate, matplotlib, lxml, pandas. These are automatically installed by `pip install .` but some system libraries have to be installed: freetype, libssl-dev, libffi-dev
-
-For now pycoeman works only in Linux systems. Requires Python 3.5.
 
 The installation makes the following command-line tools available: `coeman-seq-local`, `coeman-par-local`, `coeman-par-ssh` and `coeman-par-sge`
 
@@ -72,7 +88,7 @@ Parallel commands can be executed with pycoeman. Which commands are executed is 
 
 The parallel commands XML configuration file must contain a root tag `<ParCommands>`. Then, for each commands we have to add a XML element `<Component>` which must have as child elements the `<id>` and a `<command>` elements. This is the same as the sequential commands XML configuration file format. However, in this case each `<Component>` tag must also contain a `<output>`, which determines which files or folder are the output. Like in the sequential commands XML configuration file format, `<requirelist>` and `<require>` are also used to define the required data by each command.
 
-When running a parallel commands with pycoeman using `coeman-par-local`, `coeman-par-ssh` or `coeman-par-sge`, each command is executed in a different execution folder and possibly in a different computer. For each command, the required data is copied/linked from the location where the pycoeman tool is launched run is lunched to the remote execution folder, and then the command is executed. When the command is finished the elements indicated in `<output>` are copied back to the location where the pycoeman tool was launched. How the data is copied from the location where the pycoeman tool is launched to the remote execution folders (and viceversa) depends on the used hardware systems.
+When running a parallel commands with pycoeman using `coeman-par-local`, `coeman-par-ssh` or `coeman-par-sge`, each command is executed in a different execution folder and possibly in a different computer. For each command, the required data is copied/linked from the location where the pycoeman tool is launched run is lunched to the remote execution folder, and then the command is executed. When the command is finished the elements indicated in `<output>` are copied back to the location where the pycoeman tool was launched. How the data is copied from the location where the pycoeman tool is launched to the remote execution folders (and vice-versa) depends on the used hardware systems.
 
 Note that in this case, the data indicated by `<require>` and `<requirelist>` is not shared between different commands execution. So, in each command `<require>` and `<requirelist>` must indicate ALL the required data. This is different than in the sequential commands execution where the required data can be shared by other commands since they are all executed in the same execution folder. An example XML configuration file:
 
@@ -126,7 +142,7 @@ IMPORTANT:
 
 ### Parallel commands in SGE clusters
 
-The tool `coeman-par-sge` is used to run parallel commands specified by the XML configuration files in SGE clusters, it submits jobs to the cluster queueing system. SGE clusters usually have a shared folder where all the nodes can access. However, since massive simultaneous access to the shared folder is discouraged, usually local storage in the execution nodes is used when possible. For pycomean to work properly, the required data must be in a location that can be accessed from all the cluster nodes computers. This tool requires to specify the data directory, a setenv file and local output directory. All these files and folders and the XML configuration file must be in a shared folder. The tool also requires to specify a remote execution directory. This is the directory in each remote node where the execution of the commends will be done. To submit the different jobs to the queueing system, run the produced submission script.
+The tool `coeman-par-sge` is used to run parallel commands specified by the XML configuration files in SGE clusters, it submits jobs to the cluster queuing system. SGE clusters usually have a shared folder where all the nodes can access. However, since massive simultaneous access to the shared folder is discouraged, usually local storage in the execution nodes is used when possible. For pycoeman to work properly, the required data must be in a location that can be accessed from all the cluster nodes computers. This tool requires to specify the data directory, a setenv file and local output directory. All these files and folders and the XML configuration file must be in a shared folder. The tool also requires to specify a remote execution directory. This is the directory in each remote node where the execution of the commends will be done. To submit the different jobs to the queuing system, run the produced submission script.
 
 It is assumed that the software locations are shared between all the nodes and that the setenv file will set the environment properly in all the nodes.
 
