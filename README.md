@@ -128,13 +128,14 @@ In the following example, *listimage.list* needs to be specified as *<requirelis
 </ParCommands>
 ```
 
-#### Remote execution using ssh
+### Remote execution
 
-The tools with the suffix `-ssh` are used to run commands in remote hosts. In addition to the XML configuration file, the user needs to specify the hosts
-XML file. The host XML file has a `<Host>` XML element per each host and five nested XML elements: the `<name>` to define host name, `<user>` 
-user name at the remote host, `<setenv>` to set environment before each command execution at the remote host, `<numcommands>` to define the number of
-commands executed in simultaneously, and `<exedir>` specifies the root directory for each command's execution directory (each command will then use
-`<exedir>/<commandId>` as execution directory). An example of the hosts XML file follows:
+
+The tools either with the `-ssh` or `-sge` suffix are used to run commands at remote hosts. In addition to the XML configuration file, the user needs
+to specify the hosts XML file. The host XML file has a `<Host>` XML element per each host and five nested XML elements: the `<name>` to define host
+name, `<user>` user name at the remote host, `<setenv>` to set environment before each command execution at the remote host, `<numcommands>` to
+define the number of commands executed in simultaneously, and `<exedir>` specifies the root directory for each command's execution directory
+(each command will then use `<exedir>/<commandId>` as execution directory). An example of the hosts XML file follows:
 
 ```
 <Hosts>
@@ -157,16 +158,15 @@ connections with remote hosts use SSH keys: generate a key locally with `ssh-key
 * The file specified by `<setenv>` is used to load the environment at the remote hosts. Hence, the user should make sure all the dependencies, including
 *pycoeman* are loaded through `<setenv>`. The same holds for environment variables.
 
-### Parallel commands in SGE clusters
+#### SGE clusters
 
 The tools with the suffix `-sge` run commands in clusters with Sun Grid Engine (SGE) queuing system. SGE clusters are configured to have all the nodes with
 access to a shared folder. Having all nodes simultaneously reading and writing to the shared storage is discouraged. Hence, for performance reasons the user should
 copy the input data from the shared storage to the node's local storage and use a local directory to store command's outputs.
 
-To use `coeman-par-sge` the user needs to specify an execution directory, which should also be local, and a *setenv file* to set the environment at the remote machines.
-The *setenv* file and the XML configuration file should be placed at the shared folder. Once the user runs the `coeman-par-sge` tool its output is a submission script.
-The user should run it to submit the different jobs to a SGE queuing system. It is assumed that the software locations are shared between all the nodes and
-that the setenv file will set the environment properly in all the nodes.
+The *setenv* file and the XML configuration file should be placed at the shared folder. The output of the tools with `-sge` suffix is a submission script.
+The user should run it to submit the different jobs to a SGE queuing system. It is assumed that the software locations are shared between all the nodes
+and that the setenv file will set the environment properly in all the nodes.
 
 ### Monitoring
 
