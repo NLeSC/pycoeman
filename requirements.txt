@@ -1,0 +1,7 @@
+numpy
+tabulate
+matplotlib
+lxml
+pandas
+scp
+paramiko

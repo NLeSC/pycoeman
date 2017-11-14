@@ -1,5 +1,8 @@
 from distutils.core import setup
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setup(
     name='pycoeman',
     version='1.0.0',
@@ -9,9 +12,7 @@ setup(
     author='Oscar Martinez-Rubi',
     author_email='o.rubi@esciencecenter.nl',
     url='https://github.com/NLeSC/pycoeman',
-    install_requires=[
-          'numpy', 'tabulate', 'matplotlib', 'lxml', 'pandas', 'paramiko', 'scp'
-    ],
+    install_requires=required,
     entry_points={
         'console_scripts': [
             'coeman-seq-local=pycoeman.seqcommands.run_seqcommands_local:main',
