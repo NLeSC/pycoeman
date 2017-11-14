@@ -21,36 +21,61 @@ pycoeman is used by pymicmac (https://github.com/ImproPhoto/pymicmac)
 
 ## Installation
 
-Clone this repository and install it with pip (using a virtualenv is recommended):
+For now pycoeman only works in Linux systems. It requires Python 3.5 and it is installed using pip.
+If Python 3.5 is not the default Python on user's system, the user should use **pip3** to install *pycoeman*.
+To avoid issues with dependencies and versions, and indirectly permissions, the use should use [**virtualenv**](https://virtualenv.pypa.io/en/stable/).
 
+* Installing system package dependencies
+```
+sudo apt-get install freetype libssl-dev libffi-dev
+```
+
+* Installing *pycoeman* from sources:
 ```
 git clone https://github.com/NLeSC/pycoeman
 cd pycoeman
-pip install .
+
+#If virtualenv is not installed:
+sudo apt-get install virtualenv
+
+virtualenv pycoeman_env
+. pycoeman_env/bin/activate
+
+pip3 -r requirements.txt install .
 ```
 
-Or installed directly with:
-
+* Installing *pycoeman* package:
 ```
-pip install git+https://github.com/NLeSC/pycoeman
+#If virtualenv is not installed:
+sudo apt-get install virtualenv
+
+virtualenv pycoeman_env
+. pycoeman_env/bin/activate
+
+pip3 -r requirements.txt install pycoeman
 ```
-
-Python dependencies: numpy, tabulate, matplotlib, lxml, pandas. These are automatically installed by `pip install .` but some system libraries have to be installed: freetype, libssl-dev, libffi-dev
-
-For now pycoeman works only in Linux systems. Requires Python 3.5.
 
 The installation makes the following command-line tools available: `coeman-seq-local`, `coeman-par-local`, `coeman-par-ssh` and `coeman-par-sge`
 
-## Sequential commands
+## Deployment
 
-Sequential commands can be executed with pycoeman. Which commands are executed is specified with a XML configuration file. Then, the tool `coeman-seq-local` can be used to run the sequence of commands in the local machine.
+With *Pycoeman* user's commands are executed either in *sequential mode* or *parallel mode*. The commands, their arguments and the required files/directories
+are listed in a XML configuration file. Independent from the execution mode, the commands are either executed at the user's computer (commands with *-local*
+suffix) or distributed among a set of machines (commands with either *-ssh* or *-sge* suffix). The ones with *-ssh* suffix use **ssh** to run commands at the
+remote hosts. The ones with *-sge* suffix submit the commands as jobs to a Sun Grid Engine queuing system.
 
-The sequential commands XML configuration file must contain a root tag `<SeqCommands>`. Then, for each command we have to add a XML element `<Component>` which must have as child elements at least a `<id>` and a `<command>` elements.
+### Sequential mode
 
-Since the commands will be executed in an independent execution folder, if a command requires some files/folders, these have to be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in a separate ASCII file, one file/folder per line. Both `<require>` and `<requirelist>` can be simultaneously used.  
+The sequential commands XML configuration file must contain a root tag `<SeqCommands>` and for each command a XML element `<Component>` is added with two
+mandatory nested XML elements, `<id>` and `<command>`. Dependencies on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft)
+links are created in the execution folder for the specified files/folders. Using `<require>` is recommended for small number of required files/folders, and
+they are specified comma-separated. Using `<requirelist>` is recommended when the number of required files/folders is large. In this case they are specified in
+a separate ASCII file, one file/folder per line. Both `<require>` and `<requirelist>` can be simultaneously used.  
 
-It is important to notice that since all the commands are executed in the same execution folder, if a command in the sequence already 'linked' a file/folder (using `<require>` or `<requirelist>`) there is no need to do it again. An example XML configuration file:
-
+Once the sequential mode XML configuration file is defined the user should use the tools `coeman-seq-[local | ssh | sge]` to execute them. For
+local executions, it is important to notice that since all the commands are executed in the same execution folder file/folders already linked
+for one of the commands (using `<require>` or `<requirelist>`) they don't need to be linked again. In the following example, *inputfile1* and
+*inputfile2* are linked for *Executable1* and re-used for *Executable2*.
 ```
 <SeqCommands>
   <Component>
@@ -66,16 +91,24 @@ It is important to notice that since all the commands are executed in the same e
 </SeqCommands>
 ```
 
-## Parallel commands
+### Parallel mode
 
-Parallel commands can be executed with pycoeman. Which commands are executed is specified with a XML configuration file. Then, the tool `coeman-par-local` can be used to run the sequence of commands in the local machine. The tool `coeman-par-ssh` can be used to run commands in remote hosts accessible via ssh. And the tool `coeman-par-sge` can be used to run the commands in a SGE cluster.
+The parallel commands XML configuration file must contain a root tag `<ParCommands>` and for each command a XML element `<Component>` is added with three
+mandatory nested XML elements, `<id>`, `<command>` and `<output>`. The latter determines which files and directories should be collected as output. Dependencies
+on files/directories should be specified with `<require>` or `<requirelist>` tags. (Soft) links are created in the execution folder for the specified
+files/folders. Using `<require>` is recommended for small number of required files/folders, and they are specified comma-separated. Using `<requirelist>`
+is recommended when the number of required files/folders is large. In this case they are specified in a separate ASCII file, one file/folder per line.
+Both `<require>` and `<requirelist>` can be simultaneously used.  
 
-The parallel commands XML configuration file must contain a root tag `<ParCommands>`. Then, for each commands we have to add a XML element `<Component>` which must have as child elements the `<id>` and a `<command>` elements. This is the same as the sequential commands XML configuration file format. However, in this case each `<Component>` tag must also contain a `<output>`, which determines which files or folder are the output. Like in the sequential commands XML configuration file format, `<requirelist>` and `<require>` are also used to define the required data by each command.
+Once the parallel mode XML configuration file is defined the user should use the tools `coeman-par-[local | ssh | sge]` to execute them. When running in
+parallel mode, commands are executed in a different execution folder and possibly in a more than one computer. For each command, the required data is
+copied/linked from the location where the pycoeman tool is launched to the remote execution folders. After a successful execution of the commands, the
+files listed under the tag `<output>` are copied back to the location where the pycoeman tool was launched. 
 
-When running a parallel commands with pycoeman using `coeman-par-local`, `coeman-par-ssh` or `coeman-par-sge`, each command is executed in a different execution folder and possibly in a different computer. For each command, the required data is copied/linked from the location where the pycoeman tool is launched run is lunched to the remote execution folder, and then the command is executed. When the command is finished the elements indicated in `<output>` are copied back to the location where the pycoeman tool was launched. How the data is copied from the location where the pycoeman tool is launched to the remote execution folders (and viceversa) depends on the used hardware systems.
-
-Note that in this case, the data indicated by `<require>` and `<requirelist>` is not shared between different commands execution. So, in each command `<require>` and `<requirelist>` must indicate ALL the required data. This is different than in the sequential commands execution where the required data can be shared by other commands since they are all executed in the same execution folder. An example XML configuration file:
-
+For data availability the execution model is share-nothing, i.e., the data indicated by `<require>` and `<requirelist>` is not shared between different
+commands execution. Hence, in each command `<require>` and `<requirelist>` must indicate ALL the required data. This is different than in the sequential
+commands execution where the required data from a *command A* can be shared with the other commands since they are all executed in the same execution folder.
+In the following example, *listimage.list* needs to be specified as *<requirelist>* for both *Executable1* and *Executable2* command.
 ```
 <ParCommands>
   <Component>
@@ -95,14 +128,14 @@ Note that in this case, the data indicated by `<require>` and `<requirelist>` is
 </ParCommands>
 ```
 
+### Remote execution
 
-### Parallel commands locally
 
-It is possible to use the local computer to run parallel commands specified by the XML configuration files. Use the tool in `coeman-par-local` and specify the number of processes you wish to use. In this case, (soft) links will be created for each of the commands, which will be executed in their own execution folder.
-
-### Parallel commands in remote hosts with ssh
-
-The tool `coeman-par-ssh` is used to run parallel commands in remote hosts. The commands to run are specified by the parallel commands XML configuration file. And the hosts to use are specified by the hosts XML file. An example of the hosts XML file follows:
+The tools either with the `-ssh` or `-sge` suffix are used to run commands at remote hosts. In addition to the XML configuration file, the user needs
+to specify the hosts XML file. The host XML file has a `<Host>` XML element per each host and five nested XML elements: the `<name>` to define host
+name, `<user>` user name at the remote host, `<setenv>` to set environment before each command execution at the remote host, `<numcommands>` to
+define the number of commands executed in simultaneously, and `<exedir>` specifies the root directory for each command's execution directory
+(each command will then use `<exedir>/<commandId>` as execution directory). An example of the hosts XML file follows:
 
 ```
 <Hosts>
@@ -116,19 +149,22 @@ The tool `coeman-par-ssh` is used to run parallel commands in remote hosts. The 
 </Hosts>
 ```
 
-For each remote host we want to use we need to add a `<Host>` XML element. The `<name>` is its host name. `<user>` is the user in the remote host, `<setenv>` is a file in the remote host that is "sourced" before the execution of any command. `<numcommands>` is the number of commands that we want to simultaneously run in the remote host, and `<exedir>` is the directory in the remote host where the commands will be executed. Each command will be executed in `<exedir>/<commandId>`.
+**IMPORTANT:**
+* All the required data is sent to the remote nodes using SCP, therefore, the host name must be a valid ssh-reachable host name. It is assumed that
+password-less ssh connections are possible with all the involved hosts. So, before running `coeman-par-ssh` make sure this is the case. To set password-less
+connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add the local public key to the remote machine with `ssh-copy-id <remotehost>`.
+* It is assumed that pycoeman and all software required by each commands is installed on all remote hosts.
+* The file specified by `<setenv>` is used to load the environment at the remote hosts. Hence, the user should make sure all the dependencies, including
+*pycoeman* are loaded through `<setenv>`. The same holds for environment variables.
 
-The required data is send to the remote nodes using SCP.
+#### SGE clusters
 
-IMPORTANT:
- - The host name must be a valid ssh-reachable host name. It is assumed that password-less ssh connections are possible with all the involved hosts. So, before running `coeman-par-ssh` make sure this is the case. To set password-less connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in `~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
-- It is assumed that pycoeman and the rest of software which is used by the executed commands is installed in each of the remote hosts. The file specified by `<setenv>` is used to load the environment, so at least this file must load pycoeman.
+The tools with the suffix `-sge` run commands in clusters with Sun Grid Engine (SGE) queuing system. SGE clusters should have all a shared folder accessable on all the nodes. Having all nodes simultaneously reading and writing to the shared storage is discouraged. Hence, for performance reasons the user should
+copy the input data from the shared storage to the node's local storage and use a local directory to store command's outputs.
 
-### Parallel commands in SGE clusters
-
-The tool `coeman-par-sge` is used to run parallel commands specified by the XML configuration files in SGE clusters, it submits jobs to the cluster queueing system. SGE clusters usually have a shared folder where all the nodes can access. However, since massive simultaneous access to the shared folder is discouraged, usually local storage in the execution nodes is used when possible. For pycomean to work properly, the required data must be in a location that can be accessed from all the cluster nodes computers. This tool requires to specify the data directory, a setenv file and local output directory. All these files and folders and the XML configuration file must be in a shared folder. The tool also requires to specify a remote execution directory. This is the directory in each remote node where the execution of the commends will be done. To submit the different jobs to the queueing system, run the produced submission script.
-
-It is assumed that the software locations are shared between all the nodes and that the setenv file will set the environment properly in all the nodes.
+The *setenv* file and the XML configuration file should be placed at the shared folder. The output of the tools with `-sge` suffix is a submission script.
+The user should run it to submit the different jobs to a SGE queuing system. It is assumed that the software locations are shared between all the nodes
+and that the setenv file will set the environment properly in all the nodes.
 
 ### Monitoring
 
