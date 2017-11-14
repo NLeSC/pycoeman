@@ -100,7 +100,7 @@ files/folders. Using `<require>` is recommended for small number of required fil
 is recommended when the number of required files/folders is large. In this case they are specified in a separate ASCII file, one file/folder per line.
 Both `<require>` and `<requirelist>` can be simultaneously used.  
 
-Once the parallel mode XML configuration file is defined the user should use the tools `coeman-par-[local | ssh | sge]` to execute them. When running a
+Once the parallel mode XML configuration file is defined the user should use the tools `coeman-par-[local | ssh | sge]` to execute them. When running in
 parallel mode, commands are executed in a different execution folder and possibly in a more than one computer. For each command, the required data is
 copied/linked from the location where the pycoeman tool is launched to the remote execution folders. After a successful execution of the commands, the
 files listed under the tag `<output>` are copied back to the location where the pycoeman tool was launched. 
@@ -152,16 +152,14 @@ define the number of commands executed in simultaneously, and `<exedir>` specifi
 **IMPORTANT:**
 * All the required data is sent to the remote nodes using SCP, therefore, the host name must be a valid ssh-reachable host name. It is assumed that
 password-less ssh connections are possible with all the involved hosts. So, before running `coeman-par-ssh` make sure this is the case. To set password-less
-connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add a line with the public key in the local machine in
-`~/.ssh/<key>.pub` to the `~/.ssh/authorized_keys` file in each of the remote hosts.
+connections with remote hosts use SSH keys: generate a key locally with `ssh-keygen` and add the local public key to the remote machine with `ssh-copy-id <remotehost>`.
 * It is assumed that pycoeman and all software required by each commands is installed on all remote hosts.
 * The file specified by `<setenv>` is used to load the environment at the remote hosts. Hence, the user should make sure all the dependencies, including
 *pycoeman* are loaded through `<setenv>`. The same holds for environment variables.
 
 #### SGE clusters
 
-The tools with the suffix `-sge` run commands in clusters with Sun Grid Engine (SGE) queuing system. SGE clusters are configured to have all the nodes with
-access to a shared folder. Having all nodes simultaneously reading and writing to the shared storage is discouraged. Hence, for performance reasons the user should
+The tools with the suffix `-sge` run commands in clusters with Sun Grid Engine (SGE) queuing system. SGE clusters should have all a shared folder accessable on all the nodes. Having all nodes simultaneously reading and writing to the shared storage is discouraged. Hence, for performance reasons the user should
 copy the input data from the shared storage to the node's local storage and use a local directory to store command's outputs.
 
 The *setenv* file and the XML configuration file should be placed at the shared folder. The output of the tools with `-sge` suffix is a submission script.
